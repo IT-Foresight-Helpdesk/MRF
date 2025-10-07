@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IT Support Request Form</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html, body { height: 100%; margin: 0; }
+    body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #08ac9c, #764ba2); color: #fff; display: flex; flex-direction: column; min-height: 100vh; }
+    .content { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 1rem; }
+    .form-container { background-color: #fff; color: #333; padding: 1.5rem; border-radius: 12px; max-width: 600px; width: 95%; box-shadow: 0 5px 15px rgba(0,0,0,.2); }
+    .form-title { text-align: center; color: #08ac9c; font-weight: bold; margin-bottom: 20px; font-size: 1.5rem; }
+    .submit-button { background: linear-gradient(90deg, #08ac9c, #764ba2); color:#fff; padding: 12px; border: none; border-radius: 8px; width: 100%; cursor: pointer; font-size: 1rem; font-weight: bold; }
+    .submit-button:hover { opacity: .95; }
+    .loading-text { text-align:center; color:#4a5568; font-size:.9rem; margin-top:10px; display:none; }
+    footer { background: linear-gradient(90deg, #08ac9c, #764ba2); color:#fff; text-align:center; padding:10px; font-size:.9rem; }
+  </style>
+</head>
+<body>
+  <nav class="p-4 flex justify-between flex-wrap" style="background: linear-gradient(90deg, #08ac9c, #764ba2); color: white;">
+    <a href="index.html" class="text-lg font-bold hover:text-yellow-400">Foresight IT Department</a>
+    <div class="flex gap-4 flex-wrap justify-center">
+      <a href="basic-troubleshoot.html" class="font-bold no-underline hover:text-yellow-400">Basic Troubleshoot</a>
+    </div>
+  </nav>
+
+  <div class="content">
+    <div class="form-container">
+      <h2 class="form-title">IT Support Request Form</h2>
+
+      <form id="maintenanceForm" name="it-support" method="POST" action="success.html">
+        <input type="hidden" name="ticketId" id="ticketId" />
+        <div>
+          <label>Full Name *</label>
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input type="text" name="firstName" placeholder="First Name" required class="w-full border p-2 rounded" />
+            <input type="text" name="lastName" placeholder="Last Name" required class="w-full border p-2 rounded" />
+          </div>
+        </div>
+        <div class="mt-3">
+          <label>Department *</label>
+          <select name="department" required class="w-full border p-2 rounded">
+            <option value="">-- Select a department --</option>
+            <option>HRA</option><option>Finance</option><option>Procurement</option><option>Commercial</option>
+            <option>Operation</option><option>QAQC</option><option>Foresight Dialysis</option><option>Product Engineering</option>
+            <option>Business Development</option><option>Regulatory Affairs</option><option>IT</option><option>MRF</option><option>Other</option>
+          </select>
+        </div>
+        <div class="mt-3">
+          <label>Email</label>
+          <input type="email" name="email" placeholder="example@email.com" class="w-full border p-2 rounded" />
+        </div>
+        <div class="mt-3">
+          <label>Phone Number *</label>
+          <input type="tel" name="phoneNumber" placeholder="0123456789" required class="w-full border p-2 rounded" />
+        </div>
+        <div class="mt-3">
+          <label>Date Submitted</label>
+          <input type="text" name="dateSubmitted" id="dateSubmitted" readonly class="w-full border p-2 rounded bg-gray-100 cursor-not-allowed" />
+        </div>
+        <div class="mt-3">
+          <label>Problem/ Request Category *</label>
+          <select name="problemCategory" required class="w-full border p-2 rounded">
+            <option value="">-- Select a category --</option>
+            <option>Network</option>
+            <option>Computer/ Laptop</option>
+            <option>Printer</option>
+            <option>Email</option>
+            <option>SAP</option>
+            <option>Zoom Link</option>
+            <option>CCTV/NVR</option>
+            <option>Door Access</option>
+            <option>NAS/Backup</option>
+            <option>Attendance/WhatsApp</option>
+            <option>Honeywell EDA61K</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="mt-3">
+          <label>Description *</label>
+          <textarea name="description" placeholder="Describe the issue..." required class="w-full border p-2 rounded"></textarea>
+        </div>
+        <button type="submit" class="submit-button mt-4" id="submitBtn">Submit Request</button>
+        <div class="loading-text" id="loadingText">⏳ Submitting your request, please wait...</div>
+      </form>
+    </div>
+  </div>
+
+  <footer>© 2025 Haziq IT Department Foresight</footer>
+
+  <script>
+  // === UBAH SINI: masukkan Web App /exec URL anda ===
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzVwoiPWex2I9gnU2NB53w0EDNQf8KQoQigP7tgBC_Q2KHFCzoiX2H7kDXa-VILqjVX/exec";
+
+  (function() {
+    const form        = document.getElementById('maintenanceForm');
+    const submitBtn   = document.getElementById('submitBtn');
+    const loadingText = document.getElementById('loadingText');
+    const dateField   = document.getElementById('dateSubmitted');
+
+    if (dateField && !dateField.value) { dateField.value = new Date().toLocaleDateString('en-GB'); }
+
+    const pad = n => String(n).padStart(2,'0');
+    const makeTicketId = () => {
+      const now = new Date();
+      const yyyy = now.getFullYear(), mm = pad(now.getMonth()+1), dd = pad(now.getDate());
+      const hh = pad(now.getHours()), mi = pad(now.getMinutes()), ss = pad(now.getSeconds());
+      const rand = Math.random().toString(36).slice(2,6).toUpperCase();
+      return `FS-IT-${yyyy}${mm}${dd}-${hh}${mi}${ss}-${rand}`;
+    };
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      loadingText.style.display = 'block';
+      submitBtn.disabled = true;
+
+      const ticket = makeTicketId();
+      document.getElementById('ticketId').value = ticket;
+
+      const fd = new FormData(form);
+      const name = ((fd.get('firstName')||'') + ' ' + (fd.get('lastName')||'')).trim();
+      sessionStorage.setItem('lastTicket', ticket);
+      sessionStorage.setItem('lastRequester', name);
+      if (fd.get('email')) sessionStorage.setItem('lastEmail', fd.get('email'));
+
+      const payload = new URLSearchParams(Object.fromEntries(fd));
+      payload.set('ticketId', ticket);
+      payload.set('source', location.hostname || 'Portal');
+      payload.set('userAgent', navigator.userAgent || '');
+
+      try {
+        const body = payload.toString();
+        let sent = false;
+        if (navigator.sendBeacon) {
+          sent = navigator.sendBeacon(APPS_SCRIPT_URL, new Blob([body], { type: 'application/x-www-form-urlencoded;charset=UTF-8' }));
+        }
+        if (!sent) {
+          fetch(APPS_SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{ 'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8' }, body }).catch(()=>{});
+        }
+      } catch (_) {}
+
+      const url = new URL('success.html', window.location.href);
+      url.searchParams.set('ticket', ticket);
+      window.location.assign(url.toString());
+    });
+  })();
+  </script>
+</body>
+</html>
