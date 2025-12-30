@@ -28,11 +28,14 @@
       align-items: center;
       justify-content: center;
       gap: 12px;
-      flex-wrap: nowrap; /* Allow wrap on small screens */
+      flex-wrap: nowrap; /* Prevent wrapping */
     }
     header img {
       height: 50px; /* Adjust logo size */
       width: auto;
+    }
+    header span {
+      font-size: clamp(1.5rem, 4vw, 2rem); /* Responsive font size */
     }
     main {
       flex: 1;
