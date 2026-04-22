@@ -18,13 +18,12 @@
     .content {
       flex: 1;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
       padding: 1rem;
     }
     .form-container {
-      background-color: #fff;
+      background: #fff;
       color: #333;
       padding: 1.5rem;
       border-radius: 12px;
@@ -78,12 +77,12 @@
 
   <div class="content">
     <div class="form-container">
-      <h2 class="form-title">IT Service Request Form</h2>
+      <h2 class="form-title">IT Service Request Form TEST 123</h2>
 
-      <form id="requestForm" method="POST" action="success.html">
+      <form id="requestForm">
         <div class="mt-3">
           <label>Full Name *</label>
-          <input type="text" name="name" placeholder="Full Name" required class="w-full border p-2 rounded" />
+          <input type="text" name="name" required class="w-full border p-2 rounded" />
         </div>
 
         <div class="mt-3">
@@ -106,12 +105,12 @@
 
         <div class="mt-3">
           <label>Email</label>
-          <input type="email" name="email" placeholder="Need to use Email Company" class="w-full border p-2 rounded" />
+          <input type="email" name="email" class="w-full border p-2 rounded" />
         </div>
 
         <div class="mt-3">
           <label>Phone Number *</label>
-          <input type="tel" name="phone" placeholder="0123456789" required class="w-full border p-2 rounded" />
+          <input type="tel" name="phone" required class="w-full border p-2 rounded" />
         </div>
 
         <div class="mt-3">
@@ -136,15 +135,7 @@
             rows="5"
             required
             class="w-full border p-2 rounded"
-            placeholder="Sila jelaskan permintaan anda dengan jelas:
-
-Contoh:
-- Software: Adobe Acrobat untuk edit PDF
-- Printer: Setup printer di Finance department
-- Laptop: Request laptop baru untuk staff baru
-- Network: Install LAN point di bilik meeting
-
-Nyatakan juga lokasi / user terlibat jika ada."></textarea>
+            placeholder="Contoh: Install Adobe Acrobat untuk Commercial department"></textarea>
         </div>
 
         <button type="submit" class="submit-button mt-4" id="submitBtn">Submit Request</button>
@@ -156,58 +147,63 @@ Nyatakan juga lokasi / user terlibat jika ada."></textarea>
   <footer>© 2025 Haziq IT Department Foresight</footer>
 
   <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQE3XB6t_jw172_-EOASmVxtAffsH0dDZ40_9PFn2Zd2wrZRepSs0CAxYYB58IeaE/exec";
+    const APPS_SCRIPT_URL = "PASTE_APPS_SCRIPT_EXEC_URL_HERE";
 
- (function () {
-    const form = document.getElementById('requestForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const loadingText = document.getElementById('loadingText');
+    (function () {
+      const form = document.getElementById('requestForm');
+      const submitBtn = document.getElementById('submitBtn');
+      const loadingText = document.getElementById('loadingText');
+      let isSubmitting = false;
 
-    let isSubmitting = false;
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+        if (isSubmitting) return;
+        isSubmitting = true;
 
-      if (isSubmitting) return;
-      isSubmitting = true;
+        loadingText.style.display = 'block';
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
 
-      loadingText.style.display = 'block';
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Submitting...';
+        const fd = new FormData(form);
+        const payload = new URLSearchParams();
 
-      const fd = new FormData(form);
-      const payload = new URLSearchParams();
+        for (const [key, value] of fd.entries()) {
+          payload.append(key, value);
+        }
 
-      for (const [key, value] of fd.entries()) {
-        payload.append(key, value);
-      }
+        payload.append("type", "request");
 
-      payload.append("type", "request");
+        console.log(payload.toString());
 
-      try {
-        const response = await fetch(APPS_SCRIPT_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-          },
-          body: payload.toString()
-        });
+        try {
+          const response = await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+            },
+            body: payload.toString()
+          });
 
-        const text = await response.text();
-        console.log(text);
+          const text = await response.text();
+          console.log(text);
 
-        window.location.href = "success.html";
-      } catch (error) {
-        console.error(error);
-        alert("Submission failed. Please try again.");
-
-        isSubmitting = false;
-        loadingText.style.display = 'none';
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit Request';
-      }
-    });
-  })();
-</script>
+          alert("Request submitted successfully");
+          form.reset();
+          loadingText.style.display = 'none';
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Submit Request';
+          isSubmitting = false;
+        } catch (error) {
+          console.error(error);
+          alert("Submission failed. Please try again.");
+          loadingText.style.display = 'none';
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Submit Request';
+          isSubmitting = false;
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
