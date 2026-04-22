@@ -158,55 +158,56 @@ Nyatakan juga lokasi / user terlibat jika ada."></textarea>
   <script>
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQE3XB6t_jw172_-EOASmVxtAffsH0dDZ40_9PFn2Zd2wrZRepSs0CAxYYB58IeaE/exec";
 
-    (function () {
-      const form = document.getElementById('requestForm');
-      const submitBtn = document.getElementById('submitBtn');
-      const loadingText = document.getElementById('loadingText');
+ (function () {
+    const form = document.getElementById('requestForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const loadingText = document.getElementById('loadingText');
 
-      let isSubmitting = false;
+    let isSubmitting = false;
 
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-        if (isSubmitting) return;
-        isSubmitting = true;
+      if (isSubmitting) return;
+      isSubmitting = true;
 
-        loadingText.style.display = 'block';
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Submitting...';
+      loadingText.style.display = 'block';
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting...';
 
-        const fd = new FormData(form);
-        const payload = new URLSearchParams();
+      const fd = new FormData(form);
+      const payload = new URLSearchParams();
 
-        for (const [key, value] of fd.entries()) {
-          payload.append(key, value);
-        }
+      for (const [key, value] of fd.entries()) {
+        payload.append(key, value);
+      }
 
-        payload.append("type", "request");
+      payload.append("type", "request");
 
-        try {
-          const response = await fetch(APPS_SCRIPT_URL, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-            },
-            body: payload.toString()
-          });
+      try {
+        const response = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+          },
+          body: payload.toString()
+        });
 
-          const resultText = await response.text();
-          console.log(resultText);
+        const text = await response.text();
+        console.log(text);
 
-          window.location.href = "success.html";
-        } catch (error) {
-          console.error(error);
-          alert("Submission failed. Please try again.");
-          isSubmitting = false;
-          loadingText.style.display = 'none';
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Submit Request';
-        }
-      });
-    })();
-  </script>
+        window.location.href = "success.html";
+      } catch (error) {
+        console.error(error);
+        alert("Submission failed. Please try again.");
+
+        isSubmitting = false;
+        loadingText.style.display = 'none';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Request';
+      }
+    });
+  })();
+</script>
 </body>
 </html>
